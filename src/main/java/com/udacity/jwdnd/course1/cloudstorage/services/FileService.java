@@ -29,4 +29,16 @@ public class FileService {
         byte[] fileData = file.getBytes();
         fileMapper.insert(new File(null, fileName, contentType, fileSize, userId, fileData));
     }
+
+    public String[] getFileNames(Integer userId) {
+        return fileMapper.getFileNames(userId);
+    }
+
+    public void deleteFile(String fileName) {
+        fileMapper.deleteFile(fileName);
+    }
+
+    public File getFile(String fileName) {
+        return fileMapper.getFile(fileName);
+    }
 }

@@ -38,6 +38,6 @@ public class SignupController {
             return "signup";
         }
         model.addAttribute("success", true);
-        return "signup";
+        return "login";
     }
 }
