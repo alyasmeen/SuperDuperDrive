@@ -27,7 +27,7 @@ public class FileService {
         String fileSize = String.valueOf(file.getSize());
         Integer userId = userMapper.getUser(username).getUserId();
         byte[] fileData = file.getBytes();
-        fileMapper.insert(new File(null, fileName, contentType, fileSize, userId, fileData));
+        fileMapper.insertFile(new File(null, fileName, contentType, fileSize, userId, fileData));
     }
 
     public String[] getFileNames(Integer userId) {

@@ -1,6 +1,9 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.Note;
+import com.udacity.jwdnd.course1.cloudstorage.model.NoteFormObj;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
+import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -16,16 +19,19 @@ import java.io.IOException;
 public class HomeController {
     private UserService userService;
     private FileService fileService;
+    private NoteService noteService;
 
-    public HomeController(UserService userService, FileService fileService) {
+    public HomeController(UserService userService, FileService fileService, NoteService noteService) {
         this.userService=userService;
         this.fileService = fileService;
+        this.noteService=noteService;
     }
 
     @GetMapping()
-    public String getHomePage(Model model, Authentication auth) {
+    public String getHomePage(@ModelAttribute("note") NoteFormObj note, Model model, Authentication auth) {
         Integer userId = getUserId(auth);
         model.addAttribute("files", fileService.getFileNames(userId));
+        model.addAttribute("notes", noteService.getNotesByUser(userId));
         return "home";
     }
 
@@ -65,9 +71,24 @@ public class HomeController {
     }
 
     @GetMapping("/delete-file/{fileName}")
-    public String delete(Authentication auth, @PathVariable String fileName, Model model) {
+    public String deleteFile(Authentication auth, @PathVariable String fileName, Model model) {
         fileService.deleteFile(fileName);
         model.addAttribute("files", fileService.getFileNames(getUserId(auth)));
+        model.addAttribute("result", "success");
+        return "result";
+    }
+
+    @PostMapping("create-note")
+    public String createNote(@ModelAttribute("note") NoteFormObj note, Authentication auth, Model model) {
+
+        if (note.getNoteId().isEmpty()) {
+            noteService.createNote(getUserId(auth), note.getTitle(), note.getDescription());
+        } else {
+            Note oldNote = noteService.getNote(Integer.parseInt(note.getNoteId()));
+            noteService.updateNote(oldNote.getNoteId(), note.getTitle(), note.getDescription());
+        }
+
+        model.addAttribute("notes", noteService.getNotesByUser(getUserId(auth)));
         model.addAttribute("result", "success");
         return "result";
     }
