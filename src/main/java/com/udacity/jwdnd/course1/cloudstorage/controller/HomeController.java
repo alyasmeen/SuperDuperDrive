@@ -92,4 +92,12 @@ public class HomeController {
         model.addAttribute("result", "success");
         return "result";
     }
+
+    @GetMapping("/remove-note/{note}")
+    public String removeNote(@PathVariable Integer note,Authentication auth,Model model){
+        noteService.removeNote(note);
+        model.addAttribute("notes", noteService.getNotesByUser(getUserId(auth)));
+        model.addAttribute("result", "success");
+        return "result";
+    }
 }
