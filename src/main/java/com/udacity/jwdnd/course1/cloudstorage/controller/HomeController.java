@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -44,7 +43,7 @@ public class HomeController {
     }
 
     @PostMapping("file-upload")
-    public String handleFileUpload(@RequestParam("fileUpload") MultipartFile fileUpload, Authentication authentication,
+    public String handleFileUpload(@RequestParam("fileUpload") MultipartFile fileUpload, Authentication auth,
                                    Model model) {
         if (fileUpload.isEmpty()){
             model.addAttribute("result", "error");
@@ -52,14 +51,14 @@ public class HomeController {
             return "result";
         }
 
-        if (fileService.fileNameExists(authentication.getName(), fileUpload.getOriginalFilename())){
+        if (fileService.fileNameExists(auth.getName(), fileUpload.getOriginalFilename())){
             model.addAttribute("result", "error");
             model.addAttribute("errorMsg", "File name exists");
             return "result";
         }
 
         try {
-            fileService.uploadFile(fileUpload, authentication.getName());
+            fileService.uploadFile(fileUpload, auth.getName());
         } catch (IOException e) {
             model.addAttribute("result", "error");
             model.addAttribute("errorMsg", "Error");
@@ -69,8 +68,8 @@ public class HomeController {
         return "result";
     }
 
-    public Integer getUserId(Authentication authentication) {
-        return userService.getUser(authentication.getName()).getUserId();
+    public Integer getUserId(Authentication auth) {
+        return userService.getUser(auth.getName()).getUserId();
     }
 
     @GetMapping(value = "/view-file/{fileName}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
